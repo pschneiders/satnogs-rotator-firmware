@@ -3,12 +3,12 @@
 #include "rotator_config.h"
 #include "rs485.h"
 #include "endstop.h"
+#include "watchdog.h"
 
 
 AccelStepper stepper_az(1, M1IN1, M1IN2), stepper_el(1, M2IN1, M2IN2);
 rs485 rs485(RS485_DIR, RS485_TX_TIME);
 endstop switch_az(SW1, DEFAULT_HOME_STATE), switch_el(SW2, DEFAULT_HOME_STATE);
-
 
 void Homing(int32_t AZsteps, int32_t ELsteps);
 void cmd_proc(int &stepAz, int &stepEl);
@@ -34,18 +34,24 @@ void setup() {
     stepper_el.setAcceleration(MAX_ACCELERATION);
     stepper_el.setMinPulseWidth(MIN_PULSE_WIDTH);
 
-    /*Homing switch*/
+    /* Homing switch */
     switch_az.init();
     switch_el.init();
 
-    /*Serial Communication*/
+    /* Serial Communication */
     rs485.begin(BaudRate);
 
-    /*Initial Homing*/
+    /* Initial Homing */
     Homing(deg2step(-MAX_M1_ANGLE), deg2step(-MAX_M2_ANGLE));
+
+    /* Initialize WDT */
+    watchdog_init(WDT_TIMEOUT);
 }
 
 void loop() {
+    /* Update WDT */
+    watchdog_reset();
+
     /*Define the steps*/
     static int AZstep = 0, ELstep = 0;
 
