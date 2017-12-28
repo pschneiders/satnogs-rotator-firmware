@@ -2,14 +2,15 @@
 #include "rotator_pins.h"
 #include "rotator_config.h"
 #include "rs485.h"
+#include "endstop.h"
 
 
-AccelStepper stepper_az(1, M1IN1, M1IN2);
-AccelStepper stepper_el(1, M2IN1, M2IN2);
-
+AccelStepper stepper_az(1, M1IN1, M1IN2), stepper_el(1, M2IN1, M2IN2);
 rs485 rs485(RS485_DIR, RS485_TX_TIME);
+endstop switch_az(SW1, DEFAULT_HOME_STATE), switch_el(SW2, DEFAULT_HOME_STATE);
 
-void Homing(int AZsteps, int ELsteps);
+
+void Homing(int32_t AZsteps, int32_t ELsteps);
 void cmd_proc(int &stepAz, int &stepEl);
 void error(int num_error);
 int deg2step(double deg);
@@ -34,10 +35,12 @@ void setup() {
     stepper_el.setMinPulseWidth(MIN_PULSE_WIDTH);
 
     /*Homing switch*/
-    pinMode(SW1, INPUT_PULLUP);
-    pinMode(SW2, INPUT_PULLUP);
+    switch_az.init();
+    switch_el.init();
+
     /*Serial Communication*/
     rs485.begin(BaudRate);
+
     /*Initial Homing*/
     Homing(deg2step(-MAX_M1_ANGLE), deg2step(-MAX_M2_ANGLE));
 }
@@ -56,25 +59,24 @@ void loop() {
 }
 
 /*Homing Function*/
-void Homing(int AZsteps, int ELsteps) {
-    int value_Home_AZ = DEFAULT_HOME_STATE;
-    int value_Home_EL = DEFAULT_HOME_STATE;
+void Homing(int32_t AZsteps, int32_t ELsteps) {
+    bool value_Home_AZ = false;
+    bool value_Home_EL = false;
     bool isHome_AZ = false;
     bool isHome_EL = false;
 
     stepper_az.moveTo(AZsteps);
     stepper_el.moveTo(ELsteps);
 
+    /* Homing loop */
     while (isHome_AZ == false || isHome_EL == false) {
-        value_Home_AZ = digitalRead(SW1);
-        value_Home_EL = digitalRead(SW2);
-        /*Change to LOW according to Home sensor*/
-        if (value_Home_AZ == DEFAULT_HOME_STATE) {
+        value_Home_AZ = switch_az.get_state();
+        value_Home_EL = switch_el.get_state();
+        if (value_Home_AZ == true) {
             stepper_az.moveTo(stepper_az.currentPosition());
             isHome_AZ = true;
         }
-        /*Change to LOW according to Home sensor*/
-        if (value_Home_EL == DEFAULT_HOME_STATE) {
+        if (value_Home_EL == true) {
             stepper_el.moveTo(stepper_el.currentPosition());
             isHome_EL = true;
         }
@@ -89,12 +91,14 @@ void Homing(int AZsteps, int ELsteps) {
         stepper_az.run();
         stepper_el.run();
     }
-    /*Delay to Deccelerate*/
-    long time = millis();
+
+    /* Delay to Deccelerate and homing */
+    uint32_t time = millis();
     while (millis() - time < HOME_DELAY) {
         stepper_az.run();
         stepper_el.run();
     }
+
     /*Reset the steps*/
     stepper_az.setCurrentPosition(0);
     stepper_el.setCurrentPosition(0);
