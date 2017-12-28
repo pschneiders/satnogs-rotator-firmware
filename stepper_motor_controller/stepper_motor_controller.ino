@@ -5,7 +5,6 @@
 #include "endstop.h"
 #include "watchdog.h"
 
-
 AccelStepper stepper_az(1, M1IN1, M1IN2), stepper_el(1, M2IN1, M2IN2);
 rs485 rs485(RS485_DIR, RS485_TX_TIME);
 endstop switch_az(SW1, DEFAULT_HOME_STATE), switch_el(SW2, DEFAULT_HOME_STATE);
@@ -191,6 +190,10 @@ void cmd_proc(int &stepAz, int &stepEl) {
                 /*Zero the steps*/
                 stepAz = 0;
                 stepEl = 0;
+            } else if (buffer[0] == 'V' && buffer[1] == 'E') {
+                str1 = String("SatNOGS Controller v2");
+                str2 = String("\n");
+                rs485.print(str1 + str2);
             }
             BufferCnt = 0;
         }
