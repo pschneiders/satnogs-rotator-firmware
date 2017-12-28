@@ -1,29 +1,12 @@
 #include <AccelStepper.h>
 #include "rotator_pins.h"
+#include "rotator_config.h"
 #include "rs485.h"
 
-#define SPR 200 /*Step Per Revolution*/
-#define RATIO 54 /*Gear ratio*/
-
-#define MAX_AZ_ANGLE 365 /*Maximum Angle of Azimuth for homing scanning*/
-#define MAX_EL_ANGLE 365 /*Maximum Angle of Elevation for homing scanning*/
-
-#define MAX_SPEED 300
-#define MAX_ACCELERATION 100
-
-#define MIN_PULSE_WIDTH 20 /*in microsecond*/
-
-#define DEFAULT_HOME_STATE HIGH /*Change to LOW according to Home sensor*/
-
-#define HOME_DELAY 6000 /*Time for homing Decceleration in millisecond*/
-
-#define BufferSize 256
-#define BaudRate 19200
 
 AccelStepper stepper_az(1, M1IN1, M1IN2);
 AccelStepper stepper_el(1, M2IN1, M2IN2);
 
-#define RS485_TX_TIME 8 // ms
 rs485 rs485(RS485_DIR, RS485_TX_TIME);
 
 void Homing(int AZsteps, int ELsteps);
@@ -56,7 +39,7 @@ void setup() {
     /*Serial Communication*/
     rs485.begin(BaudRate);
     /*Initial Homing*/
-    Homing(deg2step(-MAX_AZ_ANGLE), deg2step(-MAX_EL_ANGLE));
+    Homing(deg2step(-MAX_M1_ANGLE), deg2step(-MAX_M2_ANGLE));
 }
 
 void loop() {
@@ -194,7 +177,7 @@ void cmd_proc(int &stepAz, int &stepEl) {
                 rs485.print(str1 + str2 + str3 + str4 + str5);
 
                 /*Move the steppers to initial position*/
-                Homing(deg2step(-MAX_AZ_ANGLE), deg2step(-MAX_EL_ANGLE));
+                Homing(deg2step(-MAX_M1_ANGLE), deg2step(-MAX_M2_ANGLE));
                 /*Zero the steps*/
                 stepAz = 0;
                 stepEl = 0;
