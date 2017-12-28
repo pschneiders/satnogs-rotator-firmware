@@ -1,16 +1,9 @@
 #include <AccelStepper.h>
+#include "rotator_pins.h"
 #include "rs485.h"
-
-#define DIR_AZ 5 /*PIN for Azimuth Direction*/
-#define STEP_AZ 6 /*PIN for Azimuth Steps*/
-#define DIR_EL 3 /*PIN for Elevation Direction*/
-#define STEP_EL 11 /*PIN for Elevation Steps*/
 
 #define SPR 200 /*Step Per Revolution*/
 #define RATIO 54 /*Gear ratio*/
-
-#define HOME_AZ 9 /*Homing switch for Azimuth*/
-#define HOME_EL 4 /*Homing switch for Elevation*/
 
 #define MAX_AZ_ANGLE 365 /*Maximum Angle of Azimuth for homing scanning*/
 #define MAX_EL_ANGLE 365 /*Maximum Angle of Elevation for homing scanning*/
@@ -27,11 +20,9 @@
 #define BufferSize 256
 #define BaudRate 19200
 
-#define MOTOR_EN 8
-AccelStepper stepper_az(1, STEP_AZ, DIR_AZ);
-AccelStepper stepper_el(1, STEP_EL, DIR_EL);
+AccelStepper stepper_az(1, M1IN1, M1IN2);
+AccelStepper stepper_el(1, M2IN1, M2IN2);
 
-#define RS485_DIR 2
 #define RS485_TX_TIME 8 // ms
 rs485 rs485(RS485_DIR, RS485_TX_TIME);
 
@@ -60,8 +51,8 @@ void setup() {
     stepper_el.setMinPulseWidth(MIN_PULSE_WIDTH);
 
     /*Homing switch*/
-    pinMode(HOME_AZ, INPUT_PULLUP);
-    pinMode(HOME_EL, INPUT_PULLUP);
+    pinMode(SW1, INPUT_PULLUP);
+    pinMode(SW2, INPUT_PULLUP);
     /*Serial Communication*/
     rs485.begin(BaudRate);
     /*Initial Homing*/
@@ -92,8 +83,8 @@ void Homing(int AZsteps, int ELsteps) {
     stepper_el.moveTo(ELsteps);
 
     while (isHome_AZ == false || isHome_EL == false) {
-        value_Home_AZ = digitalRead(HOME_AZ);
-        value_Home_EL = digitalRead(HOME_EL);
+        value_Home_AZ = digitalRead(SW1);
+        value_Home_EL = digitalRead(SW2);
         /*Change to LOW according to Home sensor*/
         if (value_Home_AZ == DEFAULT_HOME_STATE) {
             stepper_az.moveTo(stepper_az.currentPosition());
