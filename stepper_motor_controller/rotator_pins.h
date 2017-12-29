@@ -28,4 +28,9 @@
 #define SDA_PIN 3
 #define SCL_PIN 4
 
+#define PIN12 12
+#define PIN13 13
+#define A2    A2
+#define A3    A3
+
 #endif /* ROTATOR_PINS_H_ */
