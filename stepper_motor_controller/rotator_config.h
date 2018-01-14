@@ -28,7 +28,7 @@
 
 /* Stepper Motors */
 #define MIN_PULSE_WIDTH 20 /*in microsecond*/
-#define MAX_SPEED 300
+#define MAX_SPEED 400
 #define MAX_ACCELERATION 100
 #define SPR 200 /*Step Per Revolution*/
 
@@ -38,11 +38,11 @@
 #define MIN_M2_ANGLE 0
 #define MAX_M2_ANGLE 180 /*Maximum Angle of Elevation for homing scanning*/
 #define DEFAULT_HOME_STATE HIGH /*Change to LOW according to Home sensor*/
-#define HOME_DELAY 6000 /*Time for homing Decceleration in millisecond*/
+#define HOME_DELAY 10000 /*Time for homing Decceleration in millisecond*/
 
 /* Communication interface */
 #define BufferSize 256
 #define BaudRate 19200
-#define RS485_TX_TIME 8 // ms
+#define RS485_TX_TIME 9 // ms
 
 #endif /* ROTATOR_CONFIG_H_ */
