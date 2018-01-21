@@ -1,307 +1,282 @@
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
 #include <AccelStepper.h>
+#include <Wire.h>
+#include "rotator_pins.h"
+#include "rotator_config.h"
+#include "rs485.h"
+#include "endstop.h"
+#include "watchdog.h"
+#include "i2c_mux.h"
+#include "tc74.h"
 
-#define DIR_AZ 6 /*PIN for Azimuth Direction*/
-#define STEP_AZ 5 /*PIN for Azimuth Steps*/
-#define DIR_EL 10 /*PIN for Elevation Direction*/
-#define STEP_EL 9 /*PIN for Elevation Steps*/
+/******************************************************************************/
+enum _rotator_status {
+    idle = 1, moving = 2, pointing = 4, error = 8
+};
+enum _rotator_error {
+    no_error = 1, sensor_error = 2, homing_error = 4, motor_error = 8
+};
 
-#define EN 8 /*PIN for Enable or Disable Stepper Motors*/
+/******************************************************************************/
+enum _rotator_error homing(int32_t seek_az, int32_t seek_el);
+void cmd_proc(int32_t &setpoint_az, int32_t &setpoit_el);
+int32_t deg2step(float deg);
+float step2deg(int32_t step);
+bool isNumber(char *input);
 
-#define SPR 200 /*Step Per Revolution*/
-#define RATIO 54 /*Gear ratio*/
-#define T_DELAY 60000 /*Time to disable the motors in millisecond*/
+/******************************************************************************/
+AccelStepper stepper_az(1, M1IN1, M1IN2), stepper_el(1, M2IN1, M2IN2);
+rs485 rs485(RS485_DIR, RS485_TX_TIME);
+endstop switch_az(SW1, DEFAULT_HOME_STATE), switch_el(SW2, DEFAULT_HOME_STATE);
+i2c_mux pca9540(PCA9540_ID, PCA9540_CH0, PCA9540_CH1);
+tc74 temp_sensor(TC74_ID);
 
-#define HOME_AZ 4 /*Homing switch for Azimuth*/
-#define HOME_EL 3 /*Homing switch for Elevation*/
+volatile enum _rotator_status rotator_status = idle;
+volatile enum _rotator_error rotator_error = no_error;
+volatile bool homing_flag = true;
+static int32_t step_az = 0, step_el = 0;
+/******************************************************************************/
 
-#define MAX_AZ_ANGLE 365 /*Maximum Angle of Azimuth for homing scanning*/
-#define MAX_EL_ANGLE 365 /*Maximum Angle of Elevation for homing scanning*/
+void setup() {
+    /* Stepper Motor setup */
+    stepper_az.setEnablePin(MOTOR_EN);
+    stepper_az.setPinsInverted(false, false, true);
+    stepper_az.enableOutputs();
+    stepper_az.setMaxSpeed(MAX_SPEED);
+    stepper_az.setAcceleration(MAX_ACCELERATION);
+    stepper_az.setMinPulseWidth(MIN_PULSE_WIDTH);
+    stepper_el.setPinsInverted(false, false, true);
+    stepper_el.enableOutputs();
+    stepper_el.setMaxSpeed(MAX_SPEED);
+    stepper_el.setAcceleration(MAX_ACCELERATION);
+    stepper_el.setMinPulseWidth(MIN_PULSE_WIDTH);
 
-#define MAX_SPEED 300
-#define MAX_ACCELERATION 100
+    /* Homing switch */
+    switch_az.init();
+    switch_el.init();
 
-#define MIN_PULSE_WIDTH 20 /*in microsecond*/
+    /* Initialize I2C MUX */
+    pca9540.init();
 
-#define DEFAULT_HOME_STATE HIGH /*Change to LOW according to Home sensor*/
+    /* Serial Communication */
+    rs485.begin(BaudRate);
 
-#define HOME_DELAY 6000 /*Time for homing Decceleration in millisecond*/
-
-#define BufferSize 256
-#define BaudRate 19200
-
-/*Global Variables*/
-unsigned long t_DIS = 0; /*time to disable the Motors*/
-/*Define a stepper and the pins it will use*/
-AccelStepper AZstepper(1, STEP_AZ, DIR_AZ);
-AccelStepper ELstepper(1, STEP_EL, DIR_EL);
-
-void setup()
-{  
-  /*Change these to suit your stepper if you want*/
-  AZstepper.setMaxSpeed(MAX_SPEED);
-  AZstepper.setAcceleration(MAX_ACCELERATION);
-  /*Change these to suit your stepper if you want*/
-  ELstepper.setMaxSpeed(MAX_SPEED);
-  ELstepper.setAcceleration(MAX_ACCELERATION);
-  /*Set minimum pulse width*/
-  AZstepper.setMinPulseWidth(MIN_PULSE_WIDTH);
-  ELstepper.setMinPulseWidth(MIN_PULSE_WIDTH);
-  /*Enable Motors*/
-  pinMode(EN, OUTPUT);
-  digitalWrite(EN, LOW);
-  /*Homing switch*/
-  pinMode(HOME_AZ, INPUT_PULLUP);
-  pinMode(HOME_EL, INPUT_PULLUP);
-  /*Serial Communication*/
-  Serial.begin(BaudRate);
-  /*Initial Homing*/
-  Homing(deg2step(-MAX_AZ_ANGLE), deg2step(-MAX_EL_ANGLE));
+    /* Initialize WDT */
+    watchdog_init(WDT_TIMEOUT);
 }
 
-void loop()
-{ 
-  /*Define the steps*/
-  static int AZstep = 0;
-  static int ELstep = 0;
-  /*Time Check*/
-  if (t_DIS == 0)
-    t_DIS = millis();
+void loop() {
+    /* Update WDT */
+    watchdog_reset();
 
-  /*Disable Motors*/
-  if (AZstep == AZstepper.currentPosition() && ELstep == ELstepper.currentPosition() && millis()-t_DIS > T_DELAY)
-    digitalWrite(EN, HIGH);
-  /*Enable Motors*/
-  else
-    digitalWrite(EN, LOW);
-    
-  /*Read the steps from serial*/
-  cmd_proc(AZstep, ELstep);
-  /*Move the Azimuth & Elevation Motor*/
-  stepper_move(AZstep, ELstep);
+    /*Read the steps from serial*/
+    cmd_proc(step_az, step_el);
+
+    if (rotator_status != error) {
+        if (homing_flag == false) {
+            rotator_error = homing(deg2step(-MAX_M1_ANGLE), deg2step(-MAX_M2_ANGLE));
+            if (rotator_error == no_error) {
+                /*Zero the steps*/
+                step_az = 0;
+                step_el = 0;
+                rotator_status = idle;
+                homing_flag = true;
+            } else {
+                rotator_status = error;
+            }
+        } else {
+            /*Move the Azimuth & Elevation Motor*/
+            stepper_az.moveTo(step_az);
+            stepper_el.moveTo(step_el);
+            stepper_az.run();
+            stepper_el.run();
+            rotator_status = pointing;
+            if (stepper_az.distanceToGo() == 0 && stepper_el.distanceToGo() == 0) {
+                rotator_status = idle;
+            }
+        }
+    } else {
+        /* error handler */
+        stepper_az.stop();
+        stepper_az.disableOutputs();
+        stepper_el.stop();
+        stepper_el.disableOutputs();
+    }
 }
 
 /*Homing Function*/
-void Homing(int AZsteps, int ELsteps)
-{
-  int value_Home_AZ = DEFAULT_HOME_STATE;
-  int value_Home_EL = DEFAULT_HOME_STATE;
-  boolean isHome_AZ = false;
-  boolean isHome_EL = false;
-  
-  AZstepper.moveTo(AZsteps);
-  ELstepper.moveTo(ELsteps);
-  
-  while(isHome_AZ == false || isHome_EL == false)
-  {
-    value_Home_AZ = digitalRead(HOME_AZ);
-    value_Home_EL = digitalRead(HOME_EL);
-    /*Change to LOW according to Home sensor*/
-    if (value_Home_AZ == DEFAULT_HOME_STATE)
-    {
-      AZstepper.moveTo(AZstepper.currentPosition());
-      isHome_AZ = true;
-    }   
-    /*Change to LOW according to Home sensor*/
-    if (value_Home_EL == DEFAULT_HOME_STATE)
-    {
-      ELstepper.moveTo(ELstepper.currentPosition());
-      isHome_EL = true;
+enum _rotator_error homing(int32_t seek_az, int32_t seek_el) {
+    bool isHome_az = false;
+    bool isHome_el = false;
+
+    stepper_az.moveTo(seek_az);
+    stepper_el.moveTo(seek_el);
+
+    /* Homing loop */
+    while (isHome_az == false || isHome_el == false) {
+        /* Update WDT */
+        watchdog_reset();
+        /* Homing routine */
+        if (switch_az.get_state() == true) {
+            stepper_az.moveTo(stepper_az.currentPosition());
+            isHome_az = true;
+        }
+        if (switch_el.get_state() == true) {
+            stepper_el.moveTo(stepper_el.currentPosition());
+            isHome_el = true;
+        }
+        if (stepper_az.distanceToGo() == 0 && !isHome_az) {
+            return homing_error;
+        }
+        if (stepper_el.distanceToGo() == 0 && !isHome_el) {
+            return homing_error;
+        }
+        stepper_az.run();
+        stepper_el.run();
     }
-    if (AZstepper.distanceToGo() == 0 && !isHome_AZ)
-    {
-      error(0);
-      break;
+    /* Delay to Deccelerate and homing */
+    uint32_t time = millis();
+    while (millis() - time < HOME_DELAY) {
+        watchdog_reset();
+        stepper_az.run();
+        stepper_el.run();
     }
-    if (ELstepper.distanceToGo() == 0 && !isHome_EL)
-    {
-      error(1);
-      break;
-    }
-    AZstepper.run();
-    ELstepper.run();
-  }
-  /*Delay to Deccelerate*/
-  long time = millis();  
-  while(millis() - time < HOME_DELAY)
-  {  
-    AZstepper.run();
-    ELstepper.run();
-  }
-  /*Reset the steps*/
-  AZstepper.setCurrentPosition(0);
-  ELstepper.setCurrentPosition(0); 
+    /*Reset the steps*/
+    stepper_az.setCurrentPosition(0);
+    stepper_el.setCurrentPosition(0);
+
+    return no_error;
 }
- 
+
 /*EasyComm 2 Protocol & Calculate the steps*/
-void cmd_proc(int &stepAz, int &stepEl)
-{
-  /*Serial*/
-  char buffer[BufferSize];
-  char incomingByte;
-  char *Data = buffer;
-  char *rawData;
-  static int BufferCnt = 0;
-  char data[100];
-  
-  double angleAz, angleEl;
-  
-  /*Read from serial*/
-  while (Serial.available() > 0)
-  {
-    incomingByte = Serial.read();
-    /* XXX: Get position using custom and test code */
-    if (incomingByte == '!')
-    {
-      /*Get position*/
-      Serial.print("TM");
-      Serial.print(1);
-      Serial.print(" ");
-      Serial.print("AZ");
-      Serial.print(10*step2deg(AZstepper.currentPosition()), 1);
-      Serial.print(" ");
-      Serial.print("EL");
-      Serial.println(10*step2deg(ELstepper.currentPosition()), 1);
-    }
-    /*new data*/
-    else if (incomingByte == '\n')
-    {
-      buffer[BufferCnt] = 0;
-      if (buffer[0] == 'A' && buffer[1] == 'Z')
-      {
-        if (buffer[2] == ' ' && buffer[3] == 'E' && buffer[4] == 'L')
-        {
-          /*Get position*/
-          Serial.print("AZ");
-          Serial.print(step2deg(AZstepper.currentPosition()), 1);
-          Serial.print(" ");
-          Serial.print("EL");
-          Serial.print(step2deg(ELstepper.currentPosition()), 1);
-          Serial.println(" ");
-        }
-        else
-        {
-          /*Get the absolute value of angle*/
-          rawData = strtok_r(Data, " " , &Data);
-          strncpy(data, rawData+2, 10);
-          if (isNumber(data))
-          {
-            angleAz = atof(data);
-            /*Calculate the steps*/
-            stepAz = deg2step(angleAz);
-          }
-          /*Get the absolute value of angle*/
-          rawData = strtok_r(Data, " " , &Data);
-          if (rawData[0] == 'E' && rawData[1] == 'L')
-          {
-            strncpy(data, rawData+2, 10);
-            if (isNumber(data))
-            {
-              angleEl = atof(data);
-              /*Calculate the steps*/
-              stepEl = deg2step(angleEl);
+void cmd_proc(int32_t &setpoint_az, int32_t &setpoint_el) {
+    /*Serial*/
+    char buffer[BufferSize];
+    char incomingByte;
+    char *Data = buffer;
+    char *rawData;
+    static uint16_t BufferCnt = 0;
+    char data[100];
+    String str1, str2, str3, str4, str5, str6;
+
+    /*Read from serial*/
+    while (rs485.available() > 0) {
+        incomingByte = rs485.read();
+
+        /*new data*/
+        if (incomingByte == '\n') {
+            buffer[BufferCnt] = 0;
+            if (buffer[0] == 'A' && buffer[1] == 'Z') {
+                if (buffer[2] == ' ' && buffer[3] == 'E' && buffer[4] == 'L') {
+                    /*Get position*/
+                    str1 = String("AZ");
+                    str2 = String(step2deg(stepper_az.currentPosition()), 1);
+                    str3 = String(" EL");
+                    str4 = String(step2deg(stepper_el.currentPosition()), 1);
+                    str5 = String("\n");
+                    rs485.print(str1 + str2 + str3 + str4 + str5);
+                } else {
+                    /*Get the absolute value of angle*/
+                    rawData = strtok_r(Data, " ", &Data);
+                    strncpy(data, rawData + 2, 10);
+                    if (isNumber(data)) {
+                        /*Calculate the steps*/
+                        setpoint_az = deg2step(atof(data));
+                    }
+                    /*Get the absolute value of angle*/
+                    rawData = strtok_r(Data, " ", &Data);
+                    if (rawData[0] == 'E' && rawData[1] == 'L') {
+                        strncpy(data, rawData + 2, 10);
+                        if (isNumber(data)) {
+                            /*Calculate the steps*/
+                            setpoint_el = deg2step(atof(data));
+                        }
+                    }
+                }
             }
-          }
+            /*Stop Moving*/
+            else if (buffer[0] == 'S' && buffer[1] == 'A' && buffer[2] == ' '
+                    && buffer[3] == 'S' && buffer[4] == 'E') {
+                /*Get position*/
+                str1 = String("AZ");
+                str2 = String(step2deg(stepper_az.currentPosition()), 1);
+                str3 = String(" EL");
+                str4 = String(step2deg(stepper_el.currentPosition()), 1);
+                str5 = String("\n");
+                rs485.print(str1 + str2 + str3 + str4 + str5);
+                setpoint_az = stepper_az.currentPosition();
+                setpoint_el = stepper_el.currentPosition();
+            }
+            /*Reset the rotator*/
+            else if (buffer[0] == 'R' && buffer[1] == 'E' && buffer[2] == 'S'
+                    && buffer[3] == 'E' && buffer[4] == 'T') {
+                /*Get position*/
+                str1 = String("AZ");
+                str2 = String(step2deg(stepper_az.currentPosition()), 1);
+                str3 = String(" EL");
+                str4 = String(step2deg(stepper_el.currentPosition()), 1);
+                str5 = String("\n");
+                rs485.print(str1 + str2 + str3 + str4 + str5);
+                homing_flag = false;
+            } else if (buffer[0] == 'V' && buffer[1] == 'E') {
+                str1 = String("VE");
+                str2 = String("SatNOGS-v2");
+                str3 = String("\n");
+                rs485.print(str1 + str2 + str3);
+            } else if (buffer[0] == 'I' && buffer[1] == 'P' && buffer[2] == '0') {
+                pca9540.set_channel(PCA9540_CH1);
+                temp_sensor.wake_up();
+                str1 = String("IP0,");
+                str2 = String(temp_sensor.get_temp(), DEC);
+                str3 = String("\n");
+                rs485.print(str1 + str2 + str3);
+                temp_sensor.sleep();
+            } else if (buffer[0] == 'I' && buffer[1] == 'P' && buffer[2] == '1') {
+                str1 = String("IP1,");
+                str2 = String(switch_az.get_state(), DEC);
+                str3 = String("\n");
+                rs485.print(str1 + str2 + str3);
+            } else if (buffer[0] == 'I' && buffer[1] == 'P' && buffer[2] == '2') {
+                str1 = String("IP2,");
+                str2 = String(switch_el.get_state(), DEC);
+                str3 = String("\n");
+                rs485.print(str1 + str2 + str3);
+            } else if (buffer[0] == 'G' && buffer[1] == 'S') {
+                str1 = String("GS");
+                str2 = String(rotator_status, DEC);
+                str3 = String("\n");
+                rs485.print(str1 + str2 + str3);
+            } else if (buffer[0] == 'G' && buffer[1] == 'E') {
+                str1 = String("GE");
+                str2 = String(rotator_error, DEC);
+                str3 = String("\n");
+                rs485.print(str1 + str2 + str3);
+            }
+            BufferCnt = 0;
+            rs485.flush();
         }
-      }
-      /*Stop Moving*/
-      else if (buffer[0] == 'S' && buffer[1] == 'A' && buffer[2] == ' ' && buffer[3] == 'S' && buffer[4] == 'E')
-      {
-        /*Get position*/
-        Serial.print("AZ");
-        Serial.print(step2deg(AZstepper.currentPosition()), 1);
-        Serial.print(" ");
-        Serial.print("EL");
-        Serial.println(step2deg(ELstepper.currentPosition()), 1);
-        stepAz = AZstepper.currentPosition();
-        stepEl = ELstepper.currentPosition();
-      }
-      /*Reset the rotator*/
-      else if (buffer[0] == 'R' && buffer[1] == 'E' && buffer[2] == 'S' && buffer[3] == 'E' && buffer[4] == 'T')
-      {
-        /*Get position*/
-        Serial.print("AZ");
-        Serial.print(step2deg(AZstepper.currentPosition()), 1);
-        Serial.print(" ");
-        Serial.print("EL");
-        Serial.println(step2deg(ELstepper.currentPosition()), 1);
-        /*Move the steppers to initial position*/
-        Homing(deg2step(-MAX_AZ_ANGLE), deg2step(-MAX_EL_ANGLE));
-        /*Zero the steps*/
-        stepAz = 0;
-        stepEl = 0;
-      }      
-      BufferCnt = 0;
-      /*Reset the disable motor time*/
-      t_DIS = 0;
+        /*Fill the buffer with incoming data*/
+        else {
+            buffer[BufferCnt] = incomingByte;
+            BufferCnt++;
+        }
     }
-    /*Fill the buffer with incoming data*/
-    else {
-      buffer[BufferCnt] = incomingByte;
-      BufferCnt++;
-    }
-  }
-}
-
-/*Error Handling*/
-void error(int num_error)
-{
-  switch (num_error)
-  {
-    /*Azimuth error*/
-    case (0):
-      while(1)
-      {
-        Serial.println("AL001");
-        delay(100);
-      }
-    /*Elevation error*/
-    case (1):
-      while(1)
-      {
-        Serial.println("AL002");
-        delay(100);
-      }
-    default:
-      while(1)
-      {
-        Serial.println("AL000");
-        delay(100);
-      }
-  }
-}
-
-/*Send pulses to stepper motor drivers*/
-void stepper_move(int stepAz, int stepEl)
-{
-  AZstepper.moveTo(stepAz);
-  ELstepper.moveTo(stepEl);
-    
-  AZstepper.run();
-  ELstepper.run();
 }
 
 /*Convert degrees to steps*/
-int deg2step(double deg)
-{
-  return(RATIO*SPR*deg/360);
+int32_t deg2step(float deg) {
+    return (RATIO * SPR * deg / 360);
 }
 
 /*Convert steps to degrees*/
-double step2deg(int Step)
-{
-  return(360.00*Step/(SPR*RATIO));
+float step2deg(int32_t step) {
+    return (360.00 * step / (SPR * RATIO));
 }
 
 /*Check if is argument in number*/
-boolean isNumber(char *input)
-{
-  for (int i = 0; input[i] != '\0'; i++)
-  {
-    if (isalpha(input[i]))
-      return false;
-  }
-   return true;
+bool isNumber(char *input) {
+    for (uint16_t i = 0; input[i] != '\0'; i++) {
+        if (isalpha(input[i]))
+            return false;
+    }
+    return true;
 }
