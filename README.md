@@ -10,8 +10,8 @@ Electronics can be found on [satnogs-rotator-controller](https://gitlab.com/libr
 
 In order to use this code, you need to install
  * [AccelStepper library](http://www.airspayce.com/mikem/arduino/AccelStepper/index.html)
- * [PID_v1 library]
- * [Wire library]
+ * PID_v1 library
+ * Wire library
 
 You need to choose the version of the Firmware you will be utilizing based on your controller and rotator setup. Namely we have two different versions (one for DC motors and one for Stepper motors).
 
