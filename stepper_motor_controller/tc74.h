@@ -72,7 +72,7 @@ public:
     }
 
 private:
-    uint8_t _id;
+    int _id;
 };
 
 #endif /* TC74_H_ */
