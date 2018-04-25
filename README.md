@@ -53,6 +53,7 @@ ARDMK_DIR – Directory where you have copied the makefile
 AVR_TOOLS_DIR – Directory where avr tools are installed
 USER_LIB_PATH – Directory where arduino libraries are installed
 AVRDUDE – Directory where avrdude are installed
+AVRDUDE_ARD_BAUDRATE – Serial Baudrate (uncomment to use 57600 for FTDI)
 include – Directory where Arduino.mk are installed
 ```
 
