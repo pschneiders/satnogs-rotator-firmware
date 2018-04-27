@@ -8,19 +8,19 @@
 #ifndef ROTATOR_PINS_H_
 #define ROTATOR_PINS_H_
 
-#define M1IN1 6
-#define M1IN2 5
+#define M1IN1 10
+#define M1IN2 9
 #define M1SF  7
 #define M1FB  A1
 
 #define M2IN1 11
 #define M2IN2 3
-#define M2SF  10
+#define M2SF  6
 #define M2FB  A0
 
 #define MOTOR_EN 8
 
-#define SW1 9
+#define SW1 5
 #define SW2 4
 
 #define RS485_DIR 2
