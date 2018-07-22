@@ -21,4 +21,6 @@ BOOTLOADER_FILE = optiboot/optiboot_atmega328.hex
 ISP_PROG = buspirate
 ISP_PORT = /dev/ttyUSB0
 
+#AVRDUDE_ARD_BAUDRATE = 57600
+
 include /home/azisi/opt/Arduino-Makefile/Arduino.mk
