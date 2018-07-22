@@ -123,12 +123,17 @@ make burn_bootloader
 * SA, Stop azimuth moving
 * SE, Stop elevation moving
 * RESET, Move to home position
+* PARK, Move to park position
 * IP, Read an input, number
     * Temperature = 0
     * SW1 = 1
     * SW2 = 2
     * Encoder1 = 3
     * Encoder2 = 4
+    * Load of M1/AZ = 5
+    * Load of M2/EL = 6
+    * Speed of M1/AZ (DPS) = 7
+    * Speed of M2/EL (DPS) = 8
 * VE, Request Version
 * GS, Get status register, number
     * idle = 1
@@ -140,14 +145,33 @@ make burn_bootloader
     * sensor_error = 2
     * homing_error = 4
     * motor_error = 8
-
-TODO:
+    * over_temperature = 12
+    * wdt_error = 16
 * VL, Velocity Left ,number [mdeg/s]
 * VR, Velocity Right, number [mdeg/s]
 * VU, Velocity Up, number [mdeg/s]
 * VD, Velocity Down, number [mdeg/s]
 * CR, Read config, register [0-x]
+    * Gain P for M1/AZ = 1
+    * Gain I for M1/AZ = 2
+    * Gain D for M1/AZ = 3
+    * Gain P for M2/EL = 4
+    * Gain I for M2/EL = 5
+    * Gain D for M2/EL = 6
+    * Azimuth park position = 7
+    * Elevation park position = 8
+    * Control mode (position = 0, speed = 1) = 9
 * CW, Write config, register [0-x]
+    * Gain P for M1/AZ = 1
+    * Gain I for M1/AZ = 2
+    * Gain D for M1/AZ = 3
+    * Gain P for M2/EL = 4
+    * Gain I for M2/EL = 5
+    * Gain D for M2/EL = 6
+    * Azimuth park position = 7
+    * Elevation park position = 8
+    * This reg is set from Vx commands control mode (position = 0, speed = 1) = 9
+* RB, custom command to reboot controller
 
 ## Controller Configurations
 
@@ -163,19 +187,19 @@ TODO:
 ## Pins Configuration
 
 ```
-M1IN1 6, Step or PWM1
-M1IN2 5, Direction or PWM2
+M1IN1 10, Step or PWM1
+M1IN2 9, Direction or PWM2
 M1SF  7, Status flag
 M1FB  A1, Load measurment
 
 M2IN1 11, Step or PWM1
 M2IN2 3, Direction or PWM2
-M2SF  10, Status flag
+M2SF  6, Status flag
 M2FB  A0, Load measurment
 
 MOTOR_EN 8, Enable/Disable motors
 
-SW1 9, Endstop for axis 1
+SW1 5, Endstop for axis 1
 SW2 4, Endstop for axis 2
 
 RS485_DIR 2, RS485 Half Duplex direction pin
