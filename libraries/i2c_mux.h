@@ -10,6 +10,8 @@
 
 #include <Wire.h>
 
+#define I2C_FREQ 100000
+
 class i2c_mux {
 public:
 
