@@ -80,8 +80,8 @@ public:
             // Calculate the real angle
             real_pos = ((raw_pos + 360 * _n) / _enc_ratio) - _angle_offset;
             _raw_prev_pos = raw_pos;
-            *new_pos = (double)real_pos;
         }
+        *new_pos = (double)real_pos;
         return status_val;
     }
 
