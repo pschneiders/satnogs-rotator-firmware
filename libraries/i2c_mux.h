@@ -1,9 +1,11 @@
-/*
- * i2c_mux.h
- *
- *  Created on: Nov 12, 2017
- *      Author: azisi
- */
+/*!
+* @file i2c_mux.h
+*
+* It is a driver for I2C 1-of-2 multiplexer (like PCA9540B) with 2-Channels.
+*
+* Licensed under the GPLv3
+*
+*/
 
 #ifndef I2C_MUX_H_
 #define I2C_MUX_H_
@@ -12,6 +14,17 @@
 
 #define I2C_FREQ 100000
 
+/**************************************************************************/
+/*!
+    @brief    Class that functions for interacting with  I2C 1-of-2 multiplexer.
+    @param    id
+              I2C ID in HEX
+    @param    ch0
+              Channel 0 in HEX
+    @param    ch1
+              Channel 1 in HEX
+*/
+/**************************************************************************/
 class i2c_mux {
 public:
 
@@ -21,11 +34,23 @@ public:
         _ch1 = ch1;
     }
 
+    /**************************************************************************/
+    /*!
+        @brief    Initialize the I2C bus
+    */
+    /**************************************************************************/
     void init() {
         Wire.begin();
         Wire.setClock(I2C_FREQ);
     }
 
+    /**************************************************************************/
+    /*!
+        @brief    Change the channel
+        @param    ch
+                  Set the channel that is connected with Master, CH0 or CH1
+    */
+    /**************************************************************************/
     void set_channel(uint8_t ch) {
         if (ch == _ch0) {
             Wire.beginTransmission(_id);
