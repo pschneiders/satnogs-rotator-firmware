@@ -78,7 +78,7 @@ public:
             else if (delta_raw_pos < -180)
                 _n--;
             // Calculate the real angle
-            real_pos = ((raw_pos + 360 * _n) / _enc_ratio) - _angle_offset;
+            real_pos = - ((raw_pos + 360 * _n) / _enc_ratio) - _angle_offset;
             _raw_prev_pos = raw_pos;
         }
         *new_pos = (double)real_pos;
