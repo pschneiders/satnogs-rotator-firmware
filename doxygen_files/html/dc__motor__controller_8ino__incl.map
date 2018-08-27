@@ -1,0 +1,12 @@
+<map id="dc_motor_controller/dc_motor_controller.ino" name="dc_motor_controller/dc_motor_controller.ino">
+<area shape="rect" id="node4" href="$globals_8h.html" title="../libraries/globals.h" alt="" coords="449,244,600,271"/>
+<area shape="rect" id="node6" href="$easycomm_8h.html" title="../libraries/easycomm.h" alt="" coords="709,169,884,196"/>
+<area shape="rect" id="node10" href="$rotator__pins_8h.html" title="rotator_pins.h" alt="" coords="987,244,1099,271"/>
+<area shape="rect" id="node11" href="$endstop_8h.html" title="../libraries/endstop.h" alt="" coords="1061,95,1215,121"/>
+<area shape="rect" id="node12" href="$watchdog_8h.html" title="../libraries/watchdog.h" alt="" coords="775,95,941,121"/>
+<area shape="rect" id="node13" href="$i2c__mux_8h.html" title="../libraries/i2c_mux.h" alt="" coords="108,95,267,121"/>
+<area shape="rect" id="node14" href="$tc74_8h.html" title="../libraries/tc74.h" alt="" coords="291,95,422,121"/>
+<area shape="rect" id="node15" href="$motor_8h.html" title="../libraries/motor.h" alt="" coords="1239,95,1381,121"/>
+<area shape="rect" id="node16" href="$as5601_8h.html" title="../libraries/as5601.h" alt="" coords="447,95,597,121"/>
+<area shape="rect" id="node9" href="$rs485_8h.html" title="rs485.h" alt="" coords="785,244,856,271"/>
+</map>

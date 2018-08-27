@@ -1,0 +1,12 @@
+<map id="homing" name="homing">
+<area shape="rect" id="node2" href="$classAS5601.html#a9cbfc7e9a35fd7b4c0cfa04fec4bf0c5" title="Calculate an unwrap the position. " alt="" coords="335,62,465,89"/>
+<area shape="rect" id="node5" href="$classendstop.html#a530a60aaf81bd5022e56df71c194dfbc" title="Get the state of end&#45;stop. " alt="" coords="134,37,277,64"/>
+<area shape="rect" id="node6" href="$classAS5601.html#a865a4971a787bbdb9ff64fd31e2eb348" title="Reset zero position set the offset to zero. " alt="" coords="138,88,273,114"/>
+<area shape="rect" id="node7" href="$classmotor.html#a01f848ad7e9ff16b4cb61174d3a5a084" title="Move the DC motor with constant voltage (~speed) " alt="" coords="152,290,259,317"/>
+<area shape="rect" id="node8" href="$classmotor.html#a9395e462f009a775c5fbe11f4c39150c" title="Stop moving the DC motor. " alt="" coords="351,240,449,266"/>
+<area shape="rect" id="node9" href="$classi2c__mux.html#af4a7327c09d2f0ea8ee5a5797871e876" title="Change the channel. " alt="" coords="124,240,287,266"/>
+<area shape="rect" id="node10" href="$classAS5601.html#af760a7dd400974baf9daebad22920bdb" title="Set zero by setting offset angle. " alt="" coords="138,138,273,165"/>
+<area shape="rect" id="node11" href="$classwdt__timer.html#a1be743743ff4d19d726a45c2d49fbada" title="Reset the watchdog timer. " alt="" coords="126,342,285,383"/>
+<area shape="rect" id="node3" href="$classAS5601.html#a2d48c32082d4bfa19bde77d614cc78dc" title="AS5601::i2c_word_transaction" alt="" coords="513,37,731,64"/>
+<area shape="rect" id="node4" href="$classAS5601.html#afcac1b1abeeea88e465694373136168a" title="AS5601::i2c_byte_transaction" alt="" coords="779,62,993,89"/>
+</map>

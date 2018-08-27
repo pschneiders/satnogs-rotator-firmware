@@ -1,0 +1,6 @@
+<map id="homing" name="homing">
+<area shape="rect" id="node2" href="$classendstop.html#a530a60aaf81bd5022e56df71c194dfbc" title="Get the state of end&#45;stop. " alt="" coords="132,5,275,32"/>
+<area shape="rect" id="node3" href="$stepper__motor__controller_8ino.html#ac9a4325f61d2c3b2f45582cc3234df41" title="stepper_az" alt="" coords="157,56,250,83"/>
+<area shape="rect" id="node4" href="$stepper__motor__controller_8ino.html#ae50506f007819f8841a2ead6e8ddb509" title="stepper_el" alt="" coords="158,107,249,133"/>
+<area shape="rect" id="node5" href="$classwdt__timer.html#a1be743743ff4d19d726a45c2d49fbada" title="Reset the watchdog timer. " alt="" coords="124,158,283,199"/>
+</map>

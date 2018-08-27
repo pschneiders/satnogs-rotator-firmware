@@ -1,0 +1,24 @@
+var searchData=
+[
+  ['m1fb',['M1FB',['../rotator__pins_8h.html#a4e12c241b5699b8487b50dbda38a2714',1,'rotator_pins.h']]],
+  ['m1in1',['M1IN1',['../rotator__pins_8h.html#a52eb32b92f0d0d1fdfc59a83e22d389d',1,'rotator_pins.h']]],
+  ['m1in2',['M1IN2',['../rotator__pins_8h.html#a157fe9dc9b50d6f912b57b3422848700',1,'rotator_pins.h']]],
+  ['m1sf',['M1SF',['../rotator__pins_8h.html#a1bef437ea4477b69d7417946685cc582',1,'rotator_pins.h']]],
+  ['m2fb',['M2FB',['../rotator__pins_8h.html#a756234870d4fec1dfb965e5a4ef4b5cd',1,'rotator_pins.h']]],
+  ['m2in1',['M2IN1',['../rotator__pins_8h.html#ad43a98121cb04032302978a3319ba24e',1,'rotator_pins.h']]],
+  ['m2in2',['M2IN2',['../rotator__pins_8h.html#a1f7e92e76bed5849fc1edc2e42c995dc',1,'rotator_pins.h']]],
+  ['m2sf',['M2SF',['../rotator__pins_8h.html#a84c33ece7372e98a2b47c81491a06474',1,'rotator_pins.h']]],
+  ['magnitude_5fhigh',['MAGNITUDE_HIGH',['../as5601_8h.html#a44cb76675b777aed3142556943702c80',1,'as5601.h']]],
+  ['magnitude_5flow',['MAGNITUDE_LOW',['../as5601_8h.html#a27977fa09cf94bdf6e6f0f3d78d29c2e',1,'as5601.h']]],
+  ['max_5facceleration',['MAX_ACCELERATION',['../stepper__motor__controller_8ino.html#a58daa60c7e280af9449f3cc46097652b',1,'stepper_motor_controller.ino']]],
+  ['max_5fm1_5fangle',['MAX_M1_ANGLE',['../dc__motor__controller_8ino.html#ac81f1607c784261cee0a9759a35f18ff',1,'MAX_M1_ANGLE():&#160;dc_motor_controller.ino'],['../stepper__motor__controller_8ino.html#ac81f1607c784261cee0a9759a35f18ff',1,'MAX_M1_ANGLE():&#160;stepper_motor_controller.ino']]],
+  ['max_5fm2_5fangle',['MAX_M2_ANGLE',['../dc__motor__controller_8ino.html#acaea33d85a46b9afdd404f6a45da8470',1,'MAX_M2_ANGLE():&#160;dc_motor_controller.ino'],['../stepper__motor__controller_8ino.html#acaea33d85a46b9afdd404f6a45da8470',1,'MAX_M2_ANGLE():&#160;stepper_motor_controller.ino']]],
+  ['max_5fpwm',['MAX_PWM',['../dc__motor__controller_8ino.html#a1df990f1a1fc97b95e8d53f719968026',1,'dc_motor_controller.ino']]],
+  ['max_5fspeed',['MAX_SPEED',['../stepper__motor__controller_8ino.html#ac2cd96d53dd3ba6407db6766c3d92b26',1,'stepper_motor_controller.ino']]],
+  ['microstep',['MICROSTEP',['../stepper__motor__controller_8ino.html#aca9cca604052ac7a6f173b58b7d6e126',1,'stepper_motor_controller.ino']]],
+  ['min_5fm1_5fangle',['MIN_M1_ANGLE',['../dc__motor__controller_8ino.html#af4acc4b3e38c809c8ca4d84d5c1083cf',1,'MIN_M1_ANGLE():&#160;dc_motor_controller.ino'],['../stepper__motor__controller_8ino.html#af4acc4b3e38c809c8ca4d84d5c1083cf',1,'MIN_M1_ANGLE():&#160;stepper_motor_controller.ino']]],
+  ['min_5fm2_5fangle',['MIN_M2_ANGLE',['../dc__motor__controller_8ino.html#a45dd8cb284dc0672f292e90909ecc530',1,'MIN_M2_ANGLE():&#160;dc_motor_controller.ino'],['../stepper__motor__controller_8ino.html#a45dd8cb284dc0672f292e90909ecc530',1,'MIN_M2_ANGLE():&#160;stepper_motor_controller.ino']]],
+  ['min_5fpulse_5fwidth',['MIN_PULSE_WIDTH',['../stepper__motor__controller_8ino.html#ad95c8286fc30ece77d632ad00a94d80e',1,'stepper_motor_controller.ino']]],
+  ['min_5fpwm',['MIN_PWM',['../dc__motor__controller_8ino.html#a8507f3c11d3addead8ca0fbd55616c62',1,'dc_motor_controller.ino']]],
+  ['motor_5fen',['MOTOR_EN',['../rotator__pins_8h.html#a30b8dc781a6fe8ee7745feac552cb858',1,'rotator_pins.h']]]
+];

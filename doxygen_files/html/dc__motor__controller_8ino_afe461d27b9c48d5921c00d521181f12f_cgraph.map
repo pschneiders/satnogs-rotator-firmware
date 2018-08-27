@@ -1,0 +1,25 @@
+<map id="loop" name="loop">
+<area shape="rect" id="node2" href="$classmotor.html#ae21d592f52c6aa57a641ca3e99cf52b9" title="Disable motor driver. " alt="" coords="143,107,275,133"/>
+<area shape="rect" id="node3" href="$classeasycomm.html#a68c229f5c44074fae9992ec9ea605046" title="Get the commands from RS485 and response to the client. " alt="" coords="104,157,313,184"/>
+<area shape="rect" id="node9" href="$classmotor.html#a3fb941091e69025a6ed7b66b2458b302" title="Get the status flag of motor driver. " alt="" coords="145,208,272,235"/>
+<area shape="rect" id="node10" href="$classAS5601.html#a9cbfc7e9a35fd7b4c0cfa04fec4bf0c5" title="Calculate an unwrap the position. " alt="" coords="575,360,705,387"/>
+<area shape="rect" id="node13" href="$classendstop.html#a530a60aaf81bd5022e56df71c194dfbc" title="Get the state of end&#45;stop. " alt="" coords="373,309,515,336"/>
+<area shape="rect" id="node14" href="$classtc74.html#a5e923d126027ab1e7102b4a203698eb3" title="Reads the int8_t in temperature measurement register. " alt="" coords="149,777,269,804"/>
+<area shape="rect" id="node15" href="$dc__motor__controller_8ino.html#acb27c796ddcae7f932e2898cba368c3b" title="Move both axis with one direction in order to find home position, end&#45;stop switches. " alt="" coords="173,512,244,539"/>
+<area shape="rect" id="node17" href="$classmotor.html#a01f848ad7e9ff16b4cb61174d3a5a084" title="Move the DC motor with constant voltage (~speed) " alt="" coords="391,563,497,589"/>
+<area shape="rect" id="node18" href="$classmotor.html#a9395e462f009a775c5fbe11f4c39150c" title="Stop moving the DC motor. " alt="" coords="591,563,689,589"/>
+<area shape="rect" id="node19" href="$classi2c__mux.html#af4a7327c09d2f0ea8ee5a5797871e876" title="Change the channel. " alt="" coords="363,613,525,640"/>
+<area shape="rect" id="node21" href="$classwdt__timer.html#a1be743743ff4d19d726a45c2d49fbada" title="Reset the watchdog timer. " alt="" coords="365,665,523,706"/>
+<area shape="rect" id="node22" href="$classtc74.html#a5304cfec3e2fd0955db133ae0892c734" title="Sleep device request to the sensor on the specified address. " alt="" coords="162,879,255,905"/>
+<area shape="rect" id="node24" href="$classtc74.html#a9e10af3dbd52592f902f81885dc166d2" title="Wake up request to the sensor on the specified address. " alt="" coords="151,828,267,855"/>
+<area shape="rect" id="node4" href="$classrs485.html#a204229ca0c3ee5d24d4c5eac9a543ef7" title="The number of chars/uint8_t that are available in RS485 buffer. " alt="" coords="381,157,507,184"/>
+<area shape="rect" id="node5" href="$classrs485.html#ac549517006a6b2cff970e3390ccd2c45" title="Read a char/uint8_t from RS485 bus. " alt="" coords="397,208,491,235"/>
+<area shape="rect" id="node6" href="$classrs485.html#acffe305907c9de94dda20135bc6ad93a" title="Print a string to RS485 bus. " alt="" coords="396,5,492,32"/>
+<area shape="rect" id="node7" href="$classeasycomm.html#a0da8917b93ae0d477791a86e1edeefb9" title="easycomm::isNumber" alt="" coords="361,56,527,83"/>
+<area shape="rect" id="node8" href="$classrs485.html#af02e2635ac5bb688bc9f05895a983704" title="Waits for the transmission of outgoing serial data to complete. " alt="" coords="395,107,493,133"/>
+<area shape="rect" id="node11" href="$classAS5601.html#a2d48c32082d4bfa19bde77d614cc78dc" title="AS5601::i2c_word_transaction" alt="" coords="753,385,971,412"/>
+<area shape="rect" id="node12" href="$classAS5601.html#afcac1b1abeeea88e465694373136168a" title="AS5601::i2c_byte_transaction" alt="" coords="1019,360,1233,387"/>
+<area shape="rect" id="node16" href="$classAS5601.html#a865a4971a787bbdb9ff64fd31e2eb348" title="Reset zero position set the offset to zero. " alt="" coords="377,512,511,539"/>
+<area shape="rect" id="node20" href="$classAS5601.html#af760a7dd400974baf9daebad22920bdb" title="Set zero by setting offset angle. " alt="" coords="377,360,511,387"/>
+<area shape="rect" id="node23" href="$classtc74.html#a91d194f87d6153a0556ab5fd857e66ee" title="Reads the int8_t in status register. " alt="" coords="381,853,507,880"/>
+</map>

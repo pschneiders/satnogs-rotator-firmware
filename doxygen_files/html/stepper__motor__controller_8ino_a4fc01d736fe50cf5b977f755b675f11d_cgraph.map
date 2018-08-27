@@ -1,0 +1,8 @@
+<map id="setup" name="setup">
+<area shape="rect" id="node2" href="$classeasycomm.html#a7db30a0f3a754dc281cbedab461d76f6" title="Initialize the RS485 bus. " alt="" coords="112,5,315,32"/>
+<area shape="rect" id="node4" href="$classendstop.html#a6d24d7ed95ded92431288da42a6aebf9" title="Initialize the Input pin for end&#45;stop. " alt="" coords="162,56,265,83"/>
+<area shape="rect" id="node5" href="$stepper__motor__controller_8ino.html#ac9a4325f61d2c3b2f45582cc3234df41" title="stepper_az" alt="" coords="167,107,260,133"/>
+<area shape="rect" id="node6" href="$stepper__motor__controller_8ino.html#ae50506f007819f8841a2ead6e8ddb509" title="stepper_el" alt="" coords="168,157,259,184"/>
+<area shape="rect" id="node7" href="$classwdt__timer.html#a4463b57c8af9b89797cb222c745c0355" title="Initialize watchdog timer to 2sec time out and to set up interrupt routine. " alt="" coords="120,208,307,235"/>
+<area shape="rect" id="node3" href="$classrs485.html#ab7cf3f6e3b6e6d79dc490145aa3c1b12" title="Initialize the RS485 transceiver. " alt="" coords="363,5,465,32"/>
+</map>

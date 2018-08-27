@@ -1,0 +1,4 @@
+<map id="AS5601::get_magnitude" name="AS5601::get_magnitude">
+<area shape="rect" id="node2" href="$classAS5601.html#a2d48c32082d4bfa19bde77d614cc78dc" title="AS5601::i2c_word_transaction" alt="" coords="231,5,448,32"/>
+<area shape="rect" id="node3" href="$classAS5601.html#afcac1b1abeeea88e465694373136168a" title="AS5601::i2c_byte_transaction" alt="" coords="496,5,711,32"/>
+</map>
