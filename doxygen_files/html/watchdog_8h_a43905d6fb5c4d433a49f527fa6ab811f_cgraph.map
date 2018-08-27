@@ -1,6 +1,0 @@
-<map id="ISR" name="ISR">
-<area shape="rect" id="node2" href="$classrs485.html#a204229ca0c3ee5d24d4c5eac9a543ef7" title="The number of chars/uint8_t that are available in RS485 buffer. " alt="" coords="96,5,223,32"/>
-<area shape="rect" id="node3" href="$classrs485.html#af02e2635ac5bb688bc9f05895a983704" title="Waits for the transmission of outgoing serial data to complete. " alt="" coords="111,56,208,83"/>
-<area shape="rect" id="node4" href="$classrs485.html#acffe305907c9de94dda20135bc6ad93a" title="Print a string to RS485 bus. " alt="" coords="111,107,207,133"/>
-<area shape="rect" id="node5" href="$classrs485.html#ac549517006a6b2cff970e3390ccd2c45" title="Read a char/uint8_t from RS485 bus. " alt="" coords="112,157,207,184"/>
-</map>

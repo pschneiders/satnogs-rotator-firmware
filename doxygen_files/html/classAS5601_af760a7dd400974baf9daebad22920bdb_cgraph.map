@@ -1,5 +1,0 @@
-<map id="AS5601::set_zero" name="AS5601::set_zero">
-<area shape="rect" id="node2" href="$classAS5601.html#a9cbfc7e9a35fd7b4c0cfa04fec4bf0c5" title="Calculate an unwrap the position. " alt="" coords="188,5,319,32"/>
-<area shape="rect" id="node3" href="$classAS5601.html#afcac1b1abeeea88e465694373136168a" title="AS5601::i2c_byte_transaction" alt="" coords="632,5,847,32"/>
-<area shape="rect" id="node4" href="$classAS5601.html#a2d48c32082d4bfa19bde77d614cc78dc" title="AS5601::i2c_word_transaction" alt="" coords="367,31,584,57"/>
-</map>
