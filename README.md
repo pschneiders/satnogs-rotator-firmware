@@ -215,7 +215,7 @@ A3    A3, Analog input pin
 
 ## Testing with hamlib - rotctl or with Serial Monitor
 
-Connect the PC with contreller via UART to USB or RS485 to USB by using the right converter.
+Connect the PC with contreller via UART to USB or RS485 to USB by using the right converter (as described in [rotator controller BOM](https://gitlab.com/librespacefoundation/satnogs/satnogs-rotator-controller/blob/master/satnogs-rotator-controller-bom.ods)).
 For both options must be soldered the suitable components as descrided in [rotator controller wiki page](https://wiki.satnogs.org/SatNOGS_Rotator_Controller).
 
 Use commands of rotctl:
