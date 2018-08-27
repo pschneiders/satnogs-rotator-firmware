@@ -10,7 +10,7 @@ Electronics can be found on [satnogs-rotator-controller](https://gitlab.com/libr
 
 In order to use this code, you need to install
  * [AccelStepper library](http://www.airspayce.com/mikem/arduino/AccelStepper/index.html)
- * PID_v1 library
+ * [PID_v1 library](https://github.com/br3ttb/Arduino-PID-Library)
  * Wire library
 
 You need to choose the version of the Firmware you will be utilizing based on your controller and rotator setup. Namely we have two different versions (one for DC motors and one for Stepper motors).
@@ -84,7 +84,7 @@ ISP_PROG = buspirate (in Makefile)
 make ispload
 ```
 
-* Arduino
+* [Arduino](https://www.arduino.cc/en/Tutorial/ArduinoISP)
 
 ```
 satnogs.upload.protocol=arduino (in board.txt)
@@ -178,11 +178,11 @@ make burn_bootloader
 * Stepper Motor
     * Endstops
     * Encoders, optional
-    * UART or R485
+    * UART or R485 (For both options the firmware is the same)
 * DC Motor
     * Endstops
     * Encoders
-    * UART or RS485
+    * UART or RS485 (For both options the firmware is the same)
 
 ## Pins Configuration
 
@@ -213,13 +213,22 @@ A2    A2, Analog input pin
 A3    A3, Analog input pin
 ```
 
-## Testing with hamlib - rotctl
+## Testing with hamlib - rotctl or with Serial Monitor
 
-Use commands of rotctl.
+Connect the PC with contreller via UART to USB or RS485 to USB by using the right converter.
+For both options must be soldered the suitable components as descrided in [rotator controller wiki page](https://wiki.satnogs.org/SatNOGS_Rotator_Controller).
+
+Use commands of rotctl:
 
 ```
-rotctl -m 204 -s 19200 -r /dev/ttyUSB1 -C timeout=200 -vvvvv
+rotctl -m 204 -s 19200 -r /dev/ttyUSB1 -vvvvv
 ```
+
+Replace the /dev/ttyUSB1 with the device which is connected to PC.
+
+Use commands of easycomm 3:
+
+Send directly commands of easycomm 3 as described in Easycomm implemantation section.
 
 ## Contribute
 
@@ -227,6 +236,6 @@ The main repository lives on [Gitlab](https://gitlab.com/librespacefoundation/sa
 
 ## License
 
-&copy; 2014-2017 [Libre Space Foundation](http://libre.space).
+[![Libre Space Foundation](https://img.shields.io/badge/%C2%A9%202014--2018-Libre%20Space%20Foundation-6672D8.svg)](https://librespacefoundation.org/)
 
 Licensed under the [GPLv3](LICENSE)
