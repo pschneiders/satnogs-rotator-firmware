@@ -59,7 +59,7 @@ public:
             incomingByte = rs485.read();
 
             // Read new data, '\n' means new pacakage
-            if (incomingByte == '\n') {
+            if (incomingByte == '\n' || incomingByte == '\r') {
                 buffer[BufferCnt] = 0;
                 if (buffer[0] == 'A' && buffer[1] == 'Z') {
                     if (buffer[2] == ' ' && buffer[3] == 'E' &&
@@ -79,7 +79,10 @@ public:
                         if (isNumber(data)) {
                             control_az.setpoint = atof(data);
                         }
+                    }
+                } else if (buffer[0] == 'E' && buffer[1] == 'L') {
                         // Get the absolute position in deg for elevation
+                        rotator.control_mode = position;
                         rawData = strtok_r(Data, " ", &Data);
                         if (rawData[0] == 'E' && rawData[1] == 'L') {
                             strncpy(data, rawData + 2, 10);
@@ -87,7 +90,6 @@ public:
                                 control_el.setpoint = atof(data);
                             }
                         }
-                    }
                 } else if (buffer[0] == 'V' && buffer[1] == 'U') {
                     // Elevation increase speed in mdeg/s
                     rotator.control_mode = speed;
