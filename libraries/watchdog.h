@@ -72,7 +72,7 @@ ISR(WDT_vect) {
         String str1, str2, str3, str4, str5, str6;
         while (rs485.available() > 0) {
             incomingByte = rs485.read();
-            if (incomingByte == '\n') {
+            if (incomingByte == '\n' || incomingByte == '\r') {
                 buffer[BufferCnt] = 0;
                 if (buffer[0] == 'G' && buffer[1] == 'S') {
                     str1 = String("GS");
