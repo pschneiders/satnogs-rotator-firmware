@@ -67,8 +67,8 @@ make
 
     * Connect [arduino](https://www.arduino.cc/en/Tutorial/ArduinoISP) or buspirate for ISP programming
 
-        1. Pin 13 (SCK) to Pin 13 of arduino pro mini, ISP connector
-        2. Pin 12 (MISO) to Pin 12 of arduino pro mini, ISP connector
+        1. Pin 13 (SCK) to Pin 13 - PB5 of arduino pro mini, ISP connector
+        2. Pin 12 (MISO) to Pin 12 - PB4 of arduino pro mini, ISP connector
         3. Pin 11 (MOSI) to Pin 11 of arduino pro mini, ISP connector
         4. Pin 10 (RESET) to Pin RST of arduino pro mini, ISP connector
         5. 5+ (Vcc) to Pin VCC of arduino pro mini, ISP connector
