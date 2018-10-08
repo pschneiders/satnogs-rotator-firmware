@@ -79,6 +79,14 @@ public:
                         if (isNumber(data)) {
                             control_az.setpoint = atof(data);
                         }
+                        // Get the absolute position in deg for elevation
+                        rawData = strtok_r(Data, " ", &Data);
+                        if (rawData[0] == 'E' && rawData[1] == 'L') {
+                            strncpy(data, rawData + 2, 10);
+                            if (isNumber(data)) {
+                                control_el.setpoint = atof(data);
+                            }
+                        }
                     }
                 } else if (buffer[0] == 'E' && buffer[1] == 'L') {
                         // Get the absolute position in deg for elevation
