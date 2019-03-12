@@ -23,7 +23,7 @@
  */
 
 #define SAMPLE_TIME        0.1   ///< Control loop in s
-#define RATIO              54    ///< Gear ratio of rotator gear box
+#define RATIO              108    ///< Gear ratio of rotator gear box                                 default 54
 #define MICROSTEP          8     ///< Set Microstep
 #define MIN_PULSE_WIDTH    20    ///< In microsecond for AccelStepper
 #define MAX_SPEED          3200  ///< In steps/s, consider the microstep
@@ -33,24 +33,24 @@
 #define MAX_M1_ANGLE       360   ///< Maximum angle of azimuth
 #define MIN_M2_ANGLE       0     ///< Minimum angle of elevation
 #define MAX_M2_ANGLE       180   ///< Maximum angle of elevation
-#define DEFAULT_HOME_STATE HIGH  ///< Change to LOW according to Home sensor
+#define DEFAULT_HOME_STATE LOW  ///< Change to LOW according to Home sensor
 #define HOME_DELAY         12000 ///< Time for homing Deceleration in millisecond
 
 #include <AccelStepper.h>
 #include <Wire.h>
-#include "../libraries/globals.h"
-#include "../libraries/easycomm.h"
-#include "../libraries/rotator_pins.h"
-#include "../libraries/rs485.h"
-#include "../libraries/endstop.h"
-#include "../libraries/watchdog.h"
+#include <globals.h>
+#include <easycomm.h>
+#include <rotator_pins.h>
+//#include <rs485.h>
+#include <endstop.h>
+//#include <watchdog.h>
 
 uint32_t t_run = 0; // run time of uC
 easycomm comm;
 AccelStepper stepper_az(1, M1IN1, M1IN2);
 AccelStepper stepper_el(1, M2IN1, M2IN2);
 endstop switch_az(SW1, DEFAULT_HOME_STATE), switch_el(SW2, DEFAULT_HOME_STATE);
-wdt_timer wdt;
+//wdt_timer wdt;
 
 enum _rotator_error homing(int32_t seek_az, int32_t seek_el);
 int32_t deg2step(float deg);
@@ -78,12 +78,12 @@ void setup() {
     stepper_el.setMinPulseWidth(MIN_PULSE_WIDTH);
 
     // Initialize WDT
-    wdt.watchdog_init();
+   // wdt.watchdog_init();
 }
 
 void loop() {
     // Update WDT
-    wdt.watchdog_reset();
+   // wdt.watchdog_reset();
 
     // Get end stop status
     rotator.switch_az = switch_az.get_state();
@@ -162,7 +162,7 @@ enum _rotator_error homing(int32_t seek_az, int32_t seek_el) {
     // Homing loop
     while (isHome_az == false || isHome_el == false) {
         // Update WDT
-        wdt.watchdog_reset();
+       // wdt.watchdog_reset();
         if (switch_az.get_state() == true && !isHome_az) {
             // Find azimuth home
             stepper_az.moveTo(stepper_az.currentPosition());
@@ -186,7 +186,7 @@ enum _rotator_error homing(int32_t seek_az, int32_t seek_el) {
     // Delay to Deccelerate and homing, to complete the movements
     uint32_t time = millis();
     while (millis() - time < HOME_DELAY) {
-        wdt.watchdog_reset();
+       // wdt.watchdog_reset();
         stepper_az.run();
         stepper_el.run();
     }
