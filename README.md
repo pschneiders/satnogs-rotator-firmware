@@ -1,120 +1,20 @@
-# SatNOGS Rotator Firmware
+# SatNOGS Rotator Firmware for Arduino UNO/CNC Shield, for DIRECT CONNECTION TO PC via serial
 
-Firmware [SatNOGS Rotator Controller](https://gitlab.com/librespacefoundation/satnogs/satnogs-rotator-firmware).
+Firmware [SatNOGS Rotator Controller Based on Arduino UNO and CNC V3 Shield](https://wiki.satnogs.org/SatNOGS_Arduino_Uno/CNC_Shield_Based_Rotator_Controller).
 
-Repository includes all source files for the SatNOGS rotator controller Firmware.
+Repository includes all source files for the SatNOGS rotator controller Firmware, based on the Arduino UNO. using the CNC v3 Shield, instead of the custom SatNOGS PCB.
 
-Electronics can be found on [satnogs-rotator-controller](https://gitlab.com/librespacefoundation/satnogs/satnogs-rotator-controller)
+Electronics can be found on [satnogs-rotator-controller](https://wiki.satnogs.org/SatNOGS_Arduino_Uno/CNC_Shield_Based_Rotator_Controller)
 
 ## Instructions
 
 In order to use this code, you need to install
+ * Arduino IDE
  * [AccelStepper library](http://www.airspayce.com/mikem/arduino/AccelStepper/index.html)
  * [PID_v1 library](https://github.com/br3ttb/Arduino-PID-Library)
  * Wire library
+ * Gpredict
 
-You need to choose the version of the Firmware you will be utilizing based on your controller and rotator setup. Namely we have two different versions (one for DC motors and one for Stepper motors).
-
-##### Steps
-
-* Download arduino IDE (tested with 1.8.5)
-* Add these lines in /arduino-1.8.5/hardware/arduino/avr/boards.txt
-
-```
-##############################################################
-satnogs.name=SatNOGS
-satnogs.upload.tool=avrdude
-satnogs.upload.protocol=buspirate
-satnogs.upload.maximum_size=32256
-satnogs.upload.maximum_data_size=2048
-satnogs.upload.speed=115200
-
-satnogs.bootloader.tool=avrdude
-satnogs.bootloader.low_fuses=0xFF
-satnogs.bootloader.high_fuses=0xDE
-satnogs.bootloader.extended_fuses=0xFD
-satnogs.bootloader.unlock_bits=0x3F
-satnogs.bootloader.lock_bits=0x0F
-satnogs.bootloader.file=optiboot/optiboot_atmega328.hex
-
-satnogs.build.mcu=atmega328p
-satnogs.build.f_cpu=16000000L
-satnogs.build.board=AVR_SATNOGS
-satnogs.build.core=arduino
-satnogs.build.variant=eightanaloginputs
-##############################################################
-```
-
-* Install [Arduino-Makefile](https://github.com/sudar/Arduino-Makefile)
-
-```
-ARDUINO_DIR – Directory where Arduino is installed
-ARDMK_DIR – Directory where you have copied the makefile
-AVR_TOOLS_DIR – Directory where avr tools are installed
-USER_LIB_PATH – Directory where arduino libraries are installed
-AVRDUDE – Directory where avrdude are installed
-AVRDUDE_ARD_BAUDRATE – Serial Baudrate (uncomment to use 57600 for FTDI)
-include – Directory where Arduino.mk are installed
-```
-
-* Build the code
-
-```
-make
-```
-
-* Upload using ISP
-
-    * Connect [arduino](https://www.arduino.cc/en/Tutorial/ArduinoISP) or buspirate for ISP programming
-
-        1. Pin 13 (SCK) to Pin 13 - PB5 of arduino pro mini, ISP connector
-        2. Pin 12 (MISO) to Pin 12 - PB4 of arduino pro mini, ISP connector
-        3. Pin 11 (MOSI) to Pin 11 of arduino pro mini, ISP connector
-        4. Pin 10 (RESET) to Pin RST of arduino pro mini, ISP connector
-        5. 5+ (Vcc) to Pin VCC of arduino pro mini, ISP connector
-        6. Gnd (Gnd) to Pin GND of arduino pro mini, ISP connector
-
-* BusPirate
-
-```
-satnogs.upload.protocol=buspirate (in board.txt)
-ISP_PROG = buspirate (in Makefile)
-```
-```
-make ispload
-```
-
-* [Arduino](https://www.arduino.cc/en/Tutorial/ArduinoISP)
-
-```
-satnogs.upload.protocol=arduino (in board.txt)
-ISP_PROG = arduino (in Makefile)
-```
-
-```
-make ispload
-```
-
-* Upload using FDTI, but is necessary to uninstall arduino pro-mini from board
-
-Connect [FTDI](https://learn.sparkfun.com/tutorials/using-the-arduino-pro-mini-33v)
-
-```
-satnogs.upload.protocol=arduino (in board.txt)
-```
-```
-make upload
-```
-* Burn optiboot
-
-Only with ISP programming
-
-    * Arduino as ISP
-    * BusPirate as ISP
-
-```
-make burn_bootloader
-```
 
 ## Easycomm implemantation
 
@@ -179,56 +79,78 @@ make burn_bootloader
     * Endstops
     * Encoders, optional
     * UART or R485 (For both options the firmware is the same)
-* DC Motor
-    * Endstops
-    * Encoders
-    * UART or RS485 (For both options the firmware is the same)
+
 
 ## Pins Configuration
 
 ```
-M1IN1 10, Step or PWM1
-M1IN2 9, Direction or PWM2
-M1SF  7, Status flag
-M1FB  A1, Load measurment
-
-M2IN1 11, Step or PWM1
-M2IN2 3, Direction or PWM2
-M2SF  6, Status flag
-M2FB  A0, Load measurment
-
-MOTOR_EN 8, Enable/Disable motors
-
-SW1 5, Endstop for axis 1
-SW2 4, Endstop for axis 2
-
-RS485_DIR 2, RS485 Half Duplex direction pin
-
-SDA_PIN 3, Data I2C pin
-SCL_PIN 4, Clock I2C pin
-
-PIN12 12, Digital output pin
-PIN13 13, Digital output pin
-A2    A2, Analog input pin
-A3    A3, Analog input pin
+   #ifndef ROTATOR_PINS_H_
+   #define ROTATOR_PINS_H_
+   //#define M1IN1 10 ///< Motor 1 PWM pin
+   #define M1IN1 2 ///< Motor 1 PWM pin
+   #define M1IN2 5  ///< Motor 1 PWM pin
+   #define M1SF  7  ///< Motor 1 digital input, status flag for DC Motor Drivers
+   #define M1FB  A1 ///< Motor 1 analog input, current/load feedback for DC Motor Drivers
+   #define M2IN1 3 ///< Motor 2 PWM pin
+   #define M2IN2 6  ///< Motor 2 PWM pin
+   #define M2SF  7 ///< Motor 2 digital input, status flag for DC Motor Drivers
+   #define M2FB  A0 ///< Motor 2 analog input, current/load feedback for DC Motor Drivers
+   #define MOTOR_EN 8 ///< Digital output, to enable the motors
+   #define SW1 11 ///< Digital input, to read the status of end-stop for motor 1
+   #define SW2 9 ///< Digital input, to read the status of end-stop for motor 2
+   #define RS485_DIR 2 ///< Digital output, to set the direction of RS485 communication
+   #define SDA_PIN 3 ///< I2C data pin
+   #define SCL_PIN 4 ///< I2C clock pin
+   #define PIN12 12 ///< General purpose I/O pin
+   #define PIN13 13 ///< General purpose I/O pin
+   #define A2    A2 ///< General purpose I/O & analog pin
+   #define A3    A3 ///< General purpose I/O & analog pin
+   #endif /* ROTATOR_PINS_H_ */
 ```
 
 ## Testing with hamlib - rotctl or with Serial Monitor
 
-Connect the PC with contreller via UART to USB or RS485 to USB by using the right converter (as described in [rotator controller BOM](https://gitlab.com/librespacefoundation/satnogs/satnogs-rotator-controller/blob/master/satnogs-rotator-controller-bom.ods)).
-For both options must be soldered the suitable components as descrided in [rotator controller wiki page](https://wiki.satnogs.org/SatNOGS_Rotator_Controller).
+Software to install
+Final pieces to the preparation work are to install a couple of pieces of software. firstly Hamlib. This will be used to communicate between GPredict and the Arduino. Secondly we will install the main prediction software, GPredict. We will not be going into detail about setup of GPredict but assume that you have followed the installation guide and had a play around with it so you can understand what it is and how it works.
 
-Use commands of rotctl:
+Install hamlib
 
-```
-rotctl -m 204 -s 19200 -r /dev/ttyUSB1 -vvvvv
-```
+Download the Hamblib software and follow the installation process. this may require you installing it with Administrator rights. using device manager find the port for the Arduino, for the purposes of this we will assume it is COM7
 
-Replace the /dev/ttyUSB1 with the device which is connected to PC.
+Using a text editor, like Notepad++, to create a file with the code below in it. Note where COM7 is and amend with your own COM port. Save as a batch file (i.e. with th extension .bat file in the same folder as rotctld (Usually found in C:\Program Files (x86)\hamlib-w64-3.2\bin )
 
-Use commands of easycomm 3:
+rotctld -m 202 -r COM7 -s 9600 -T 127.0.0.1 -t 4533 -C timeout=500 -C retry=0 -vvvvvvvv > pause
+Install GPredict
 
-Send directly commands of easycomm 3 as described in Easycomm implemantation section.
+Download and install GPredict. Next we will need to add a rotator. Go to Edit > Preferences > Interfaces > Rotators > Add New
+
+Give it a name. For example Arduino. The port is localhost 4533
+
+That's it for setup. next we will test the system
+
+Testing
+We will need to do a few things to get the system running.
+
+Start the .bat file
+In GPredict open up the Antenna module and click Engage
+You should see that in the batch file output a series of commands being sent to the Arduino
+Check that both the Az and Ele work correctly by manually driving the rotator
+Occasionally this might not work first time. A restart of both hamlib and Gpredict worked
+
+Tweaks
+There is a huge variety in parts that can get bought, here are a few tweaks that may be necessary.
+
+Motors are turning the wrong way - This may need the pins checking
+
+It is only moving half the distance - Change the gear ratio in the main sketch
+
+The limit switches are not working - Change the following code in the main sketch
+
+define DEFAULT_HOME_STATE LOW ///< Change to LOW according to Home sensor
+Operation
+Operating is as simple as selecting a satellite from GPredict and then selecting track. The rotator will then follow that satellite or object.f
+
+
 
 ## Contribute
 
