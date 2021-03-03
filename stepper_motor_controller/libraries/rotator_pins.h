@@ -23,7 +23,7 @@
 
 #define MOTOR_EN 8 ///< Digital output, to enable the motors
 
-#define SW1 11 ///< Digital input, to read the status of end-stop for motor 1
+#define SW1 10 ///< Digital input, to read the status of end-stop for motor 1
 #define SW2 9 ///< Digital input, to read the status of end-stop for motor 2
 
 #define RS485_DIR 2 ///< Digital output, to set the direction of RS485 communication

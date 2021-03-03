@@ -13,7 +13,6 @@
 #include <Arduino.h>
 #include <WString.h>
 #include <avr/wdt.h>
-//#include "rs485.h"
 #include "rotator_pins.h"
 #include "globals.h"
 
@@ -37,8 +36,7 @@ public:
     */
     /**************************************************************************/
     void easycomm_init() {
-       // rs485.begin(BAUDRATE);
-	    Serial.begin(9600);
+	    Serial.begin(BAUDRATE);
     }
 
     /**************************************************************************/
@@ -67,9 +65,9 @@ public:
                         buffer[4] == 'L') {
                         // Send current absolute position in deg
                         str1 = String("AZ");
-                        str2 = String(control_az.input, 1);
+                        str2 = String((long unsigned int)control_az.input, 1);
                         str3 = String(" EL");
-                        str4 = String(control_el.input, 1);
+                        str4 = String((long unsigned int)control_el.input, 1);
                         str5 = String("\n");
                         Serial.print(str1 + str2 + str3 + str4 + str5);
                     } else {
@@ -137,9 +135,9 @@ public:
                     // Stop Moving
                     rotator.control_mode = position;
                     str1 = String("AZ");
-                    str2 = String(control_az.input, 1);
+                    str2 = String((long unsigned int)control_az.input, 1);
                     str3 = String(" EL");
-                    str4 = String(control_el.input, 1);
+                    str4 = String((long unsigned int)control_el.input, 1);
                     str5 = String("\n");
                     Serial.print(str1 + str2 + str3 + str4 + str5);
                     control_az.setpoint = control_az.input;
@@ -149,9 +147,9 @@ public:
                            buffer[4] == 'T') {
                     // Reset the rotator, go to home position
                     str1 = String("AZ");
-                    str2 = String(control_az.input, 1);
+                    str2 = String((long unsigned int)control_az.input, 1);
                     str3 = String(" EL");
-                    str4 = String(control_el.input, 1);
+                    str4 = String((long unsigned int)control_el.input, 1);
                     str5 = String("\n");
                     Serial.print(str1 + str2 + str3 + str4 + str5);
                     rotator.homing_flag = false;
@@ -160,9 +158,9 @@ public:
                     // Park the rotator
                     rotator.control_mode = position;
                     str1 = String("AZ");
-                    str2 = String(control_az.input, 1);
+                    str2 = String((long unsigned int)control_az.input, 1);
                     str3 = String(" EL");
-                    str4 = String(control_el.input, 1);
+                    str4 = String((long unsigned int)control_el.input, 1);
                     str5 = String("\n");
                     Serial.print(str1 + str2 + str3 + str4 + str5);
                     control_az.setpoint = rotator.park_az;
@@ -177,75 +175,75 @@ public:
                            buffer[2] == '0') {
                     // Get the inside temperature
                     str1 = String("IP0,");
-                    str2 = String(rotator.inside_temperature, DEC);
+                    str2 = String((long unsigned int)rotator.inside_temperature, DEC);
                     str3 = String("\n");
                     Serial.print(str1 + str2 + str3);
                 } else if (buffer[0] == 'I' && buffer[1] == 'P' &&
                            buffer[2] == '1') {
                     // Get the status of end-stop, azimuth
                     str1 = String("IP1,");
-                    str2 = String(rotator.switch_az, DEC);
+                    str2 = String((long unsigned int)rotator.switch_az, DEC);
                     str3 = String("\n");
                     Serial.print(str1 + str2 + str3);
                 } else if (buffer[0] == 'I' && buffer[1] == 'P' &&
                            buffer[2] == '2') {
                     // Get the status of end-stop, elevation
                     str1 = String("IP2,");
-                    str2 = String(rotator.switch_el, DEC);
+                    str2 = String((long unsigned int)rotator.switch_el, DEC);
                     str3 = String("\n");
                     Serial.print(str1 + str2 + str3);
                 } else if (buffer[0] == 'I' && buffer[1] == 'P' &&
                            buffer[2] == '3') {
                     // Get the current position of azimuth in deg
                     str1 = String("IP3,");
-                    str2 = String(control_az.input, 2);
+                    str2 = String((long unsigned int)control_az.input, 2);
                     str3 = String("\n");
                     Serial.print(str1 + str2 + str3);
                 } else if (buffer[0] == 'I' && buffer[1] == 'P' &&
                            buffer[2] == '4') {
                     // Get the current position of elevation in deg
                     str1 = String("IP4,");
-                    str2 = String(control_el.input, 2);
+                    str2 = String((long unsigned int)control_el.input, 2);
                     str3 = String("\n");
                     Serial.print(str1 + str2 + str3);
                 } else if (buffer[0] == 'I' && buffer[1] == 'P' &&
                            buffer[2] == '5') {
                     // Get the load of azimuth, in range of 0-1023
                     str1 = String("IP5,");
-                    str2 = String(control_az.load, DEC);
+                    str2 = String((long unsigned int)control_az.load, DEC);
                     str3 = String("\n");
                     Serial.print(str1 + str2 + str3);
                 } else if (buffer[0] == 'I' && buffer[1] == 'P' &&
                            buffer[2] == '6') {
                     // Get the load of elevation, in range of 0-1023
                     str1 = String("IP6,");
-                    str2 = String(control_el.load, DEC);
+                    str2 = String((long unsigned int)control_el.load, DEC);
                     str3 = String("\n");
                     Serial.print(str1 + str2 + str3);
                 } else if (buffer[0] == 'I' && buffer[1] == 'P' &&
                            buffer[2] == '7') {
                     // Get the speed of azimuth in deg/s
                     str1 = String("IP7,");
-                    str2 = String(control_az.speed, 2);
+                    str2 = String((long unsigned int)control_az.speed, 2);
                     str3 = String("\n");
                     Serial.print(str1 + str2 + str3);
                 } else if (buffer[0] == 'I' && buffer[1] == 'P' &&
                            buffer[2] == '8') {
                     // Get the speed of elevation in deg/s
                     str1 = String("IP8,");
-                    str2 = String(control_el.speed, 2);
+                    str2 = String((long unsigned int)control_el.speed, 2);
                     str3 = String("\n");
                     Serial.print(str1 + str2 + str3);
                 } else if (buffer[0] == 'G' && buffer[1] == 'S') {
                     // Get the status of rotator
                     str1 = String("GS");
-                    str2 = String(rotator.rotator_status, DEC);
+                    str2 = String((long unsigned int)rotator.rotator_status, DEC);
                     str3 = String("\n");
                     Serial.print(str1 + str2 + str3);
                 } else if (buffer[0] == 'G' && buffer[1] == 'E') {
                     // Get the error of rotator
                     str1 = String("GE");
-                    str2 = String(rotator.rotator_error, DEC);
+                    str2 = String((long unsigned int)rotator.rotator_error, DEC);
                     str3 = String("\n");
                     Serial.print(str1 + str2 + str3);
                 } else if(buffer[0] == 'C' && buffer[1] == 'R') {
@@ -253,55 +251,55 @@ public:
                     if (buffer[3] == '1') {
                         // Get Kp Azimuth gain
                         str1 = String("1,");
-                        str2 = String(control_az.p, 2);
+                        str2 = String((long unsigned int)control_az.p, 2);
                         str3 = String("\n");
                         Serial.print(str1 + str2 + str3);
                     } else if (buffer[3] == '2') {
                         // Get Ki Azimuth gain
                         str1 = String("2,");
-                         str2 = String(control_az.i, 2);
+                         str2 = String((long unsigned int)control_az.i, 2);
                          str3 = String("\n");
                          Serial.print(str1 + str2 + str3);
                     } else if (buffer[3] == '3') {
                         // Get Kd Azimuth gain
                         str1 = String("3,");
-                        str2 = String(control_az.d, 2);
+                        str2 = String((long unsigned int)control_az.d, 2);
                         str3 = String("\n");
                         Serial.print(str1 + str2 + str3);
                     } else if (buffer[3] == '4') {
                         // Get Kp Elevation gain
                         str1 = String("4,");
-                         str2 = String(control_el.p, 2);
+                         str2 = String((long unsigned int)control_el.p, 2);
                          str3 = String("\n");
                          Serial.print(str1 + str2 + str3);
                     } else if (buffer[3] == '5') {
                         // Get Ki Elevation gain
                         str1 = String("5,");
-                        str2 = String(control_el.i, 2);
+                        str2 = String((long unsigned int)control_el.i, 2);
                         str3 = String("\n");
                         Serial.print(str1 + str2 + str3);
                     } else if (buffer[3] == '6') {
                         // Get Kd Elevation gain
                         str1 = String("6,");
-                        str2 = String(control_el.d, 2);
+                        str2 = String((long unsigned int)control_el.d, 2);
                         str3 = String("\n");
                         Serial.print(str1 + str2 + str3);
                     } else if (buffer[3] == '7') {
                         // Get Azimuth park position
                         str1 = String("7,");
-                        str2 = String(rotator.park_az, 2);
+                        str2 = String((long unsigned int)rotator.park_az, 2);
                         str3 = String("\n");
                         Serial.print(str1 + str2 + str3);
                     } else if (buffer[3] == '8') {
                         // Get Elevation park position
                         str1 = String("8,");
-                        str2 = String(rotator.park_el, 2);
+                        str2 = String((long unsigned int)rotator.park_el, 2);
                         str3 = String("\n");
                         Serial.print(str1 + str2 + str3);
                     } else if (buffer[3] == '9') {
                         // Get control mode
                         str1 = String("9,");
-                        str2 = String(rotator.control_mode);
+                        str2 = String((long unsigned int)rotator.control_mode);
                         str3 = String("\n");
                         Serial.print(str1 + str2 + str3);
                     }
@@ -367,9 +365,10 @@ public:
                 } else if (buffer[0] == 'R' && buffer[1] == 'S'
                         && buffer[2] == 'T') {
                     // Custom command to test the watchdog timer routine
-                    while(1)
-                        ;
+                    //while(1);
+                    Serial.print("AL WATCHDOG DISABLED\n");
                 } else if (buffer[0] == 'R' && buffer[1] == 'B') {
+                    Serial.print("AL REBOOT\n");
                     // Custom command to reboot the uC
                     wdt_enable(WDTO_2S);
                     while(1);

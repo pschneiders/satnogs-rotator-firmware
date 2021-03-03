@@ -12,7 +12,7 @@
  *
  * @section dependencies Dependencies
  *
- * This firmware depends on <a href="http://www.airspayce.com/mikem/arduino/AccelStepper/index.htmlhttp://www.airspayce.com/mikem/arduino/AccelStepper/index.html">
+ * This firmware depends on <a href="http://www.airspayce.com/mikem/arduino/AccelStepper/index.html">
  * AccelStepper library</a> being present on your system. Please make sure you
  * have installed the latest version before using this firmware.
  *
@@ -23,14 +23,14 @@
  */
 
 #define SAMPLE_TIME        0.1   ///< Control loop in s
-#define RATIO              108    ///< Gear ratio of rotator gear box                                 default 54
+#define RATIO              54    ///< Gear ratio of rotator gear box
 #define MICROSTEP          8     ///< Set Microstep
 #define MIN_PULSE_WIDTH    20    ///< In microsecond for AccelStepper
 #define MAX_SPEED          3200  ///< In steps/s, consider the microstep
 #define MAX_ACCELERATION   1600  ///< In steps/s^2, consider the microstep
 #define SPR                1600L ///< Step Per Revolution, consider the microstep
 #define MIN_M1_ANGLE       0     ///< Minimum angle of azimuth
-#define MAX_M1_ANGLE       360   ///< Maximum angle of azimuth
+#define MAX_M1_ANGLE       359   ///< Maximum angle of azimuth
 #define MIN_M2_ANGLE       0     ///< Minimum angle of elevation
 #define MAX_M2_ANGLE       180   ///< Maximum angle of elevation
 #define DEFAULT_HOME_STATE LOW  ///< Change to LOW according to Home sensor
@@ -38,23 +38,25 @@
 
 #include <AccelStepper.h>
 #include <Wire.h>
-#include <globals.h>
-#include <easycomm.h>
-#include <rotator_pins.h>
-//#include <rs485.h>
-#include <endstop.h>
-//#include <watchdog.h>
+#include "libraries/globals.h"
+#include "libraries/easycomm.h"
+#include "libraries/rotator_pins.h"
+//#include "libraries/rs485.h"
+#include "libraries/endstop.h"
+//#include "libraries/watchdog.h"
 
 uint32_t t_run = 0; // run time of uC
 easycomm comm;
 AccelStepper stepper_az(1, M1IN1, M1IN2);
 AccelStepper stepper_el(1, M2IN1, M2IN2);
-endstop switch_az(SW1, DEFAULT_HOME_STATE), switch_el(SW2, DEFAULT_HOME_STATE);
+endstop switch_az(SW1, DEFAULT_HOME_STATE);
+endstop switch_el(SW2, DEFAULT_HOME_STATE);
 //wdt_timer wdt;
 
 enum _rotator_error homing(int32_t seek_az, int32_t seek_el);
 int32_t deg2step(float deg);
 float step2deg(int32_t step);
+void alarm(const char *msg);
 
 void setup() {
     // Homing switch
@@ -63,6 +65,7 @@ void setup() {
 
     // Serial Communication
     comm.easycomm_init();
+    alarm("\nAL REBOOT\n");
 
     // Stepper Motor setup
     stepper_az.setEnablePin(MOTOR_EN);
@@ -71,6 +74,7 @@ void setup() {
     stepper_az.setMaxSpeed(MAX_SPEED);
     stepper_az.setAcceleration(MAX_ACCELERATION);
     stepper_az.setMinPulseWidth(MIN_PULSE_WIDTH);
+    stepper_el.setEnablePin(MOTOR_EN);
     stepper_el.setPinsInverted(false, false, true);
     stepper_el.enableOutputs();
     stepper_el.setMaxSpeed(MAX_SPEED);
@@ -128,14 +132,17 @@ void loop() {
         }
     } else {
         // Error handler, stop motors and disable the motor driver
+        alarm("AL FULL STOP\n");
         stepper_az.stop();
         stepper_az.disableOutputs();
         stepper_el.stop();
         stepper_el.disableOutputs();
+        delay(10000);
         if (rotator.rotator_error != homing_error) {
             // Reset error according to error value
             rotator.rotator_error = no_error;
             rotator.rotator_status = idle;
+            alarm("AL ERROR CLEAR\n");
         }
     }
 }
@@ -160,14 +167,22 @@ enum _rotator_error homing(int32_t seek_az, int32_t seek_el) {
     stepper_el.moveTo(seek_el);
 
     // Homing loop
-    while (isHome_az == false || isHome_el == false) {
-        // Update WDT
-       // wdt.watchdog_reset();
+    while (isHome_az == false) {
         if (switch_az.get_state() == true && !isHome_az) {
             // Find azimuth home
             stepper_az.moveTo(stepper_az.currentPosition());
             isHome_az = true;
         }
+        // Check if the rotator goes out of limits or something goes wrong (in
+        // mechanical)
+        if (stepper_az.distanceToGo() == 0 && !isHome_az) {
+            alarm("AL HOME AZ ERROR\n");
+            return homing_error;
+        }
+        // Move motors to "seek" position
+        stepper_az.run();
+    }
+    while (isHome_el == false) {
         if (switch_el.get_state() == true && !isHome_el) {
             // Find elevation home
             stepper_el.moveTo(stepper_el.currentPosition());
@@ -175,12 +190,11 @@ enum _rotator_error homing(int32_t seek_az, int32_t seek_el) {
         }
         // Check if the rotator goes out of limits or something goes wrong (in
         // mechanical)
-        if ((stepper_az.distanceToGo() == 0 && !isHome_az) ||
-            (stepper_el.distanceToGo() == 0 && !isHome_el)){
+        if (stepper_el.distanceToGo() == 0 && !isHome_el) {
+            alarm("AL HOME EL ERROR\n");
             return homing_error;
         }
         // Move motors to "seek" position
-        stepper_az.run();
         stepper_el.run();
     }
     // Delay to Deccelerate and homing, to complete the movements
@@ -223,4 +237,8 @@ int32_t deg2step(float deg) {
 /**************************************************************************/
 float step2deg(int32_t step) {
     return (360.00 * step / (SPR * RATIO));
+}
+
+void alarm(const char *msg) {
+    Serial.print(msg);
 }
