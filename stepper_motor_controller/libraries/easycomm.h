@@ -60,10 +60,15 @@ public:
             // Read new data, '\n' means new pacakage
             if (incomingByte == '\n' || incomingByte == '\r') {
                 buffer[BufferCnt] = 0;
+// Begin GPT-6 Luna suggested change to provide compatibility with Hamlib v4.6 and newer
                 if (buffer[0] == 'A' && buffer[1] == 'Z') {
-                    if (buffer[2] == ' ' && buffer[3] == 'E' &&
+                    if (buffer[2] == '\0') {
+                        // Bare AZ query - Hamlib v4.6 and up: report current azimuth
+                        Serial.print(String("AZ") + String(control_az.input, 1) + "\n");
+// End GPT-6 Luna suggested change
+					} else { if (buffer[2] == ' ' && buffer[3] == 'E' &&
                         buffer[4] == 'L') {
-                        // Send current absolute position in deg
+                        // Send current absolute position in deg - Hamlib v4.5.5 and below
                         str1 = String("AZ");
                         str2 = String((long unsigned int)control_az.input, 1);
                         str3 = String(" EL");
@@ -88,16 +93,24 @@ public:
                         }
                     }
                 } else if (buffer[0] == 'E' && buffer[1] == 'L') {
-                        // Get the absolute position in deg for elevation
+// Begin GPT-6 Luna suggested change to provide compatibility with Hamlib v4.6 and newer
+                    if (buffer[2] == '\0') {
+                        // Bare EL query - Hamlib v4.6 and up: report current elevation
+                        Serial.print(String("EL") + String(control_el.input, 1) + "\n");
+                    } else {
+                        // Get the absolute (target) position in deg for elevation
                         rotator.control_mode = position;
                         rawData = strtok_r(Data, " ", &Data);
-                        if (rawData[0] == 'E' && rawData[1] == 'L') {
+                        if (rawData != nullptr &&
+                            rawData[0] == 'E' && rawData[1] == 'L') {
                             strncpy(data, rawData + 2, 10);
                             if (isNumber(data)) {
                                 control_el.setpoint = atof(data);
                             }
                         }
-                } else if (buffer[0] == 'V' && buffer[1] == 'U') {
+                    }
+// End GPT-6 Luna suggested change
+				} else if (buffer[0] == 'V' && buffer[1] == 'U') {
                     // Elevation increase speed in mdeg/s
                     rotator.control_mode = speed;
                     strncpy(data, Data + 2, 10);
